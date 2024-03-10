@@ -1,0 +1,258 @@
+[
+	{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "owner", "type": "address" }
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "account", "type": "address" }
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "poolAddress",
+				"type": "address"
+			}
+		],
+		"name": "AddNewPool",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "poolAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "assets",
+				"type": "uint256"
+			}
+		],
+		"name": "_Deposit",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "poolAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "assets",
+				"type": "uint256"
+			}
+		],
+		"name": "_Withdraw",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "runningTime", "type": "uint256" }
+		],
+		"name": "addNewPool",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" }
+		],
+		"name": "blacklist",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "assets", "type": "uint256" },
+			{ "internalType": "address", "name": "receiver", "type": "address" }
+		],
+		"name": "deposit",
+		"outputs": [
+			{ "internalType": "uint256", "name": "shares", "type": "uint256" }
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getActivePools",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "activePools",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBlacklisted",
+		"outputs": [
+			{ "internalType": "address[]", "name": "", "type": "address[]" }
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "address", "name": "owner", "type": "address" },
+			{ "internalType": "uint256", "name": "startTime", "type": "uint256" },
+			{ "internalType": "uint256", "name": "endTime", "type": "uint256" }
+		],
+		"name": "getCumulativeBalanceInPool",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "address", "name": "owner", "type": "address" }
+		],
+		"name": "getCurrentCumulativeBalanceInPool",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" }
+		],
+		"name": "getDepositorsInPool",
+		"outputs": [
+			{ "internalType": "address[]", "name": "", "type": "address[]" }
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "startTime", "type": "uint256" },
+			{ "internalType": "uint256", "name": "endTime", "type": "uint256" }
+		],
+		"name": "getDepositorsInPool",
+		"outputs": [
+			{ "internalType": "address[]", "name": "", "type": "address[]" }
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "poolAddress", "type": "address" },
+			{ "internalType": "uint256", "name": "startTime", "type": "uint256" },
+			{ "internalType": "uint256", "name": "endTime", "type": "uint256" }
+		],
+		"name": "getTotalSharesInPool",
+		"outputs": [
+			{ "internalType": "uint256", "name": "totalShares", "type": "uint256" }
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" }
+		],
+		"name": "removePool",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "newOwner", "type": "address" }
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "assets", "type": "uint256" },
+			{ "internalType": "address", "name": "receiver", "type": "address" },
+			{ "internalType": "address", "name": "owner", "type": "address" }
+		],
+		"name": "withdraw",
+		"outputs": [
+			{ "internalType": "uint256", "name": "shares", "type": "uint256" }
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
