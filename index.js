@@ -52,7 +52,7 @@ const webSocketProvider = new ethers.providers.WebSocketProvider(
 // contract
 
 const poolManagerContract_ConfluxTestnet = new ethers.Contract(
-	"0x27C8e580552E35EF1171A7562ae14e0D02dcb290",
+	"0x88a1C42c2E24cb4022c6Ff4eAd1a7672f8056642",
 	PoolManager,
 	webSocketProvider
 );
@@ -82,10 +82,17 @@ USDT_Token_Mumbai.approve(
 
 poolManagerContract_ConfluxTestnet.on(
 	"_Deposit",
-	async (poolAddress, receiver, assets) => {
+	async (poolAddress, receiver, assets, txInfo) => {
+		console.log("Event _Deposit");
+		const block = await txInfo.getBlock();
+		if (!block) {
+			console.log("Block not found");
+			return;
+		}
 		console.log("First parameter: ", poolAddress);
 		console.log("Second parameter: ", receiver);
 		console.log("Third parameter: ", Number(assets));
+		console.log("TxInfo: ", txInfo);
 		const numberOfAssets = assets / 10 ** 12;
 		await sendTxQueue.add({
 			poolAddress,
@@ -98,7 +105,13 @@ poolManagerContract_ConfluxTestnet.on(
 
 poolManagerContract_ConfluxTestnet.on(
 	"_Withdraw",
-	async (poolAddress, receiver, assets) => {
+	async (poolAddress, receiver, assets, txInfo) => {
+		console.log("Event _Withdraw");
+		const block = await txInfo.getBlock();
+		if (!block) {
+			console.log("Block not found");
+			return;
+		}
 		console.log("First parameter: ", poolAddress);
 		console.log("Second parameter: ", receiver);
 		console.log("Third parameter: ", Number(assets));
@@ -115,57 +128,37 @@ poolManagerContract_ConfluxTestnet.on(
 let Counter = {};
 let LastBalance = {};
 
-async function createTask(poolAddress) {
-	const pool = new ethers.Contract(poolAddress, Pool, confluxTestnetWallet);
-	const period = await pool.period();
-	Counter[poolAddress] = 0;
-	const task = async () => {
-		console.log("date now: ", Date.now());
-		const drawTimes = await pool.drawTimes();
-		if (Counter[poolAddress] != drawTimes - 2) {
-			console.log("no more draw");
-			return;
-		}
-		console.log("Counter[poolAddress]", Counter[poolAddress]);
-		console.log("drawTimes", drawTimes);
-		{
-			Counter[poolAddress] += 1;
-			const depositors =
-				await poolManagerContract_ConfluxTestnet.getDepositorsInPool(
-					poolAddress,
-					await pool.getStartTime(Counter[poolAddress]),
-					await pool.getEndTime(Counter[poolAddress])
-				);
-			const currentBalance = await APoolUSDT_Token_Mumbai.balanceOf(
-				mumbaiPolygonWallet.address
-			);
-			const totalPrize = currentBalance - LastBalance[poolAddress];
-			const winner = await pool.getWinner(depositors, totalPrize);
-			console.log("doing task");
-			console.log(winner);
-		}
-	};
-	return {
-		period,
-		task,
-	};
-}
+async function createTask(poolAddress) {}
 
-poolManagerContract_ConfluxTestnet.on("AddNewPool", async (poolAddress) => {
-	console.log("time received: ", Date.now());
-	console.log("First parameter: ", poolAddress);
-	const task = await createTask(poolAddress);
-	console.log("task.period", task.period);
-	console.log("task.task", task.task);
-	const period = task.period / 60 / 2;
-	// let now = new Date();
-	// let currentMinute = now.getMinutes();
-	// let currentHour = now.getHours();
-	// cron.schedule(`${currentMinute} ${currentHour} */${period} * *`, task.task);
-	setTimeout(() => {
-		cron.schedule(`*/${period} * * * *`, task.task);
-	}, 20000);
-});
+poolManagerContract_ConfluxTestnet.on(
+	"_Draw",
+	async (poolAddress, numDrawBefore) => {
+		console.log("Event _Draw");
+		console.log("First parameter: ", poolAddress);
+		console.log("Second parameter: ", numDrawBefore);
+		await sendTxQueue.add({
+			poolAddress,
+			currentDraw: numDrawBefore.toString(),
+			type: "draw",
+		});
+	}
+);
+
+poolManagerContract_ConfluxTestnet.on(
+	"_EarnPrize",
+	async (poolAddress, player, prize) => {
+		console.log("Event _EarnPrize");
+		console.log("First parameter: ", poolAddress);
+		console.log("Second parameter: ", player);
+		console.log("Third parameter: ", prize);
+		await sendTxQueue.add({
+			poolAddress,
+			player,
+			prize,
+			type: "earn",
+		});
+	}
+);
 
 // Array to hold connections
 let clients = [];
@@ -216,20 +209,38 @@ sendTxQueue.process(async (job, done) => {
 			0
 		);
 		await success.wait();
-		const txHash = success.hash;
-		txs.push({ txHash, type: "deposit" });
-		sendEventsToAll(success.hash);
-	} else {
+		console.log("deposite");
+		const tx = { txHash: success.hash, type: "deposit" };
+		txs.push(tx);
+		sendEventsToAll(tx);
+	} else if (job.data.type == "withdraw") {
 		const success = await aavePoolProxyContractInMumbai.withdraw(
 			USDT_Address_Mumbai,
 			job.data.numberOfAssets,
-			job.data.receiver,
-			0
+			job.data.receiver
 		);
 		await success.wait();
-		const txHash = success.hash;
-		txs.push({ txHash, type: "withdraw" });
-		sendEventsToAll(success.hash);
+		console.log("withdraw");
+		const tx = { txHash: success.hash, type: "withdraw" };
+		txs.push(tx);
+		sendEventsToAll(tx);
+	} else if (job.data.type == "draw") {
+		const tx = {
+			poolAddress: job.data.poolAddress,
+			currentDraw: job.data.currentDraw,
+			type: "draw",
+		};
+		txs.push(tx);
+		sendEventsToAll(tx);
+	} else if (job.data.type == "earn") {
+		const tx = {
+			poolAddress: job.data.poolAddress,
+			player: job.data.player,
+			prize: job.data.prize,
+			type: "earn",
+		};
+		txs.push(tx);
+		sendEventsToAll(tx);
 	}
 	done();
 });

@@ -2,6 +2,21 @@
 	{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
 	{
 		"inputs": [
+			{ "internalType": "address", "name": "target", "type": "address" }
+		],
+		"name": "AddressEmptyCode",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "account", "type": "address" }
+		],
+		"name": "AddressInsufficientBalance",
+		"type": "error"
+	},
+	{ "inputs": [], "name": "FailedInnerCall", "type": "error" },
+	{
+		"inputs": [
 			{ "internalType": "address", "name": "owner", "type": "address" }
 		],
 		"name": "OwnableInvalidOwner",
@@ -15,17 +30,11 @@
 		"type": "error"
 	},
 	{
-		"anonymous": false,
 		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "poolAddress",
-				"type": "address"
-			}
+			{ "internalType": "address", "name": "token", "type": "address" }
 		],
-		"name": "AddNewPool",
-		"type": "event"
+		"name": "SafeERC20FailedOperation",
+		"type": "error"
 	},
 	{
 		"anonymous": false,
@@ -82,8 +91,52 @@
 			},
 			{
 				"indexed": true,
+				"internalType": "uint256",
+				"name": "times",
+				"type": "uint256"
+			}
+		],
+		"name": "_Draw",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
 				"internalType": "address",
-				"name": "owner",
+				"name": "poolAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "prize",
+				"type": "uint256"
+			}
+		],
+		"name": "_EarnPrize",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "poolAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "receiver",
 				"type": "address"
 			},
 			{
@@ -198,6 +251,15 @@
 	},
 	{
 		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" }
+		],
+		"name": "getTotalCumulativeBalance",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{ "internalType": "address", "name": "poolAddress", "type": "address" },
 			{ "internalType": "uint256", "name": "startTime", "type": "uint256" },
 			{ "internalType": "uint256", "name": "endTime", "type": "uint256" }
@@ -207,6 +269,27 @@
 			{ "internalType": "uint256", "name": "totalShares", "type": "uint256" }
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "totalPrize", "type": "uint256" },
+			{ "internalType": "uint256", "name": "randomNumber", "type": "uint256" }
+		],
+		"name": "getWinner",
+		"outputs": [
+			{
+				"components": [
+					{ "internalType": "address", "name": "player", "type": "address" },
+					{ "internalType": "uint256", "name": "prize", "type": "uint256" }
+				],
+				"internalType": "struct AbstractPool.Winner[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -230,6 +313,25 @@
 		"name": "renounceOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" },
+			{ "internalType": "uint256", "name": "runningTime", "type": "uint256" }
+		],
+		"name": "startLottery",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{ "internalType": "address", "name": "pool", "type": "address" }
+		],
+		"name": "totalDeposit",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
