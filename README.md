@@ -1,1 +1,3 @@
 # Lottery-Dapp-Backend
+
+hardcode
