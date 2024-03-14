@@ -52,7 +52,7 @@ const webSocketProvider = new ethers.providers.WebSocketProvider(
 // contract
 
 const poolManagerContract_ConfluxTestnet = new ethers.Contract(
-	"0x88a1C42c2E24cb4022c6Ff4eAd1a7672f8056642",
+	"0xAF1F6e3431203B2d8fDF754E5BA9aE17ba6AFea7",
 	PoolManager,
 	webSocketProvider
 );
@@ -84,11 +84,6 @@ poolManagerContract_ConfluxTestnet.on(
 	"_Deposit",
 	async (poolAddress, receiver, assets, txInfo) => {
 		console.log("Event _Deposit");
-		const block = await txInfo.getBlock();
-		if (!block) {
-			console.log("Block not found");
-			return;
-		}
 		console.log("First parameter: ", poolAddress);
 		console.log("Second parameter: ", receiver);
 		console.log("Third parameter: ", Number(assets));
@@ -107,11 +102,6 @@ poolManagerContract_ConfluxTestnet.on(
 	"_Withdraw",
 	async (poolAddress, receiver, assets, txInfo) => {
 		console.log("Event _Withdraw");
-		const block = await txInfo.getBlock();
-		if (!block) {
-			console.log("Block not found");
-			return;
-		}
 		console.log("First parameter: ", poolAddress);
 		console.log("Second parameter: ", receiver);
 		console.log("Third parameter: ", Number(assets));
@@ -205,11 +195,11 @@ sendTxQueue.process(async (job, done) => {
 		const success = await aavePoolProxyContractInMumbai.supply(
 			USDT_Address_Mumbai,
 			job.data.numberOfAssets,
-			job.data.receiver,
+			mumbaiPolygonWallet.address,
 			0
 		);
 		await success.wait();
-		console.log("deposite");
+		console.log("deposit");
 		const tx = { txHash: success.hash, type: "deposit" };
 		txs.push(tx);
 		sendEventsToAll(tx);
@@ -217,7 +207,7 @@ sendTxQueue.process(async (job, done) => {
 		const success = await aavePoolProxyContractInMumbai.withdraw(
 			USDT_Address_Mumbai,
 			job.data.numberOfAssets,
-			job.data.receiver
+			mumbaiPolygonWallet.address
 		);
 		await success.wait();
 		console.log("withdraw");
